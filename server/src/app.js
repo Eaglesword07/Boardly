@@ -1,11 +1,20 @@
 import express from "express";
 import cors from "cors";
+import { logger } from "./middleware/logger.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import boardsRouter from "./routes/boards.routes.js";
 
 export const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(logger);
 
 app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+  res.json({ status: "ok" });
 });
+
+app.use("/api/boards", boardsRouter);
+
+app.use(notFound);
+app.use(errorHandler);
