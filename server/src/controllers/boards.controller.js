@@ -1,46 +1,66 @@
-import * as db from "../db/memory.js";
+import * as db from "../db/boards.js";
 
+// Helper functions for validating input and parsing IDs
 function isValidTitle(title) {
-    return typeof title === "string" && title.trim() !== "";
+  return typeof title === "string" && title.trim() !== "";
 }
 
-export function listBoards(req, res) {
-    res.json(db.getAllBoards());
+function parseId(value) {
+  const id = Number(value);
+  return Number.isInteger(id) ? id : null;
 }
 
-export function getBoard(req, res) {
-    const board = db.getBoardById(Number(req.params.id));
-    if (!board) {
-        return res.status(404).json({ error: "Board not found" });
-    }
-    res.json(board);
+// Controller functions for handling board-related requests
+export async function listBoards(req, res) {
+  const boards = await db.getAllBoards();
+  res.json(boards);
 }
 
-export function createBoard(req, res) {
-    const { title } = req.body ?? {};
-    if (!isValidTitle(title)) {
-        return res.status(400).json({ error: "A title is required" });
-    }
-    const board = db.createBoard(title);
-    res.status(201).json(board);
+export async function getBoard(req, res) {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(404).json({ error: "Board id not found" });
+  }
+  const board = await db.getBoardById(id);
+  if (!board) {
+    return res.status(404).json({ error: "Board not found" });
+  }
+  res.json(board);
 }
 
-export function updateBoard(req, res) {
-    const { title } = req.body ?? {};
-    if (!isValidTitle(title)) {
-        return res.status(400).json({ error: "A title is required" });
-    }
-    const board = db.updateBoard(Number(req.params.id), title);
-    if (!board) {
-        return res.status(404).json({ error: "Board not found" });
-    }
-    res.json(board);
+export async function createBoard(req, res) {
+  const { title } = req.body ?? {};
+  if (!isValidTitle(title)) {
+    return res.status(400).json({ error: "A title is required" });
+  }
+  const board = await db.createBoard(title.trim());
+  res.status(201).json(board);
 }
 
-export function deleteBoard(req, res) {
-    const deleted = db.deleteBoard(Number(req.params.id));
-    if (!deleted) {
-        return res.status(404).json({ error: "Board not found" });
-    }
-    res.status(204).send();
+export async function updateBoard(req, res) {
+  const id = parseId(req.params.id);
+  const { title } = req.body ?? {};
+  if (id === null) {
+    return res.status(404).json({ error: "Board not found" });
+  }
+  if (!isValidTitle(title)) {
+    return res.status(400).json({ error: "A title is required" });
+  }
+  const board = await db.updateBoard(id, title.trim());
+  if (!board) {
+    return res.status(404).json({ error: "Board not found" });
+  }
+  res.json(board);
+}
+
+export async function deleteBoard(req, res) {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(404).json({ error: "Board not found" });
+  }
+  const deleted = await db.deleteBoard(id);
+  if (!deleted) {
+    return res.status(404).json({ error: "Board not found" });
+  }
+  res.status(204).send();
 }
