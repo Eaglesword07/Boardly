@@ -12,7 +12,7 @@ function parseId(value) {
 
 // Controller functions for handling board-related requests
 export async function listBoards(req, res) {
-  const boards = await db.getAllBoards();
+  const boards = await db.getAllBoards(req.userId);
   res.json(boards);
 }
 
@@ -21,7 +21,7 @@ export async function getBoard(req, res) {
   if (id === null) {
     return res.status(404).json({ error: "Board id not found" });
   }
-  const board = await db.getBoardById(id);
+  const board = await db.getBoardById(id, req.userId);
   if (!board) {
     return res.status(404).json({ error: "Board not found" });
   }
@@ -33,7 +33,7 @@ export async function createBoard(req, res) {
   if (!isValidTitle(title)) {
     return res.status(400).json({ error: "A title is required" });
   }
-  const board = await db.createBoard(title.trim());
+  const board = await db.createBoard(title.trim(), req.userId);
   res.status(201).json(board);
 }
 
@@ -46,7 +46,7 @@ export async function updateBoard(req, res) {
   if (!isValidTitle(title)) {
     return res.status(400).json({ error: "A title is required" });
   }
-  const board = await db.updateBoard(id, title.trim());
+  const board = await db.updateBoard(id, title.trim(), req.userId);
   if (!board) {
     return res.status(404).json({ error: "Board not found" });
   }
@@ -58,7 +58,7 @@ export async function deleteBoard(req, res) {
   if (id === null) {
     return res.status(404).json({ error: "Board not found" });
   }
-  const deleted = await db.deleteBoard(id);
+  const deleted = await db.deleteBoard(id, req.userId);
   if (!deleted) {
     return res.status(404).json({ error: "Board not found" });
   }
