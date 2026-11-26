@@ -4,6 +4,7 @@ import { logger } from "./middleware/logger.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import boardsRouter from "./routes/boards.routes.js";
 import authRouter from "./routes/auth.routes.js";
+import listsRouter from "./routes/lists.routes.js"
 
 export const app = express();
 
@@ -17,6 +18,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/boards", boardsRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/lists", listsRouter);
 
 app.use(notFound);
 app.use(errorHandler);

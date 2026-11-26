@@ -14,3 +14,13 @@ CREATE TABLE IF NOT EXISTS boards (
 );
 
 CREATE INDEX IF NOT EXISTS boards_owner_id_idx ON boards (owner_id);
+
+CREATE TABLE IF NOT EXISTS lists (
+  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  board_id INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  position INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS lists_board_id_idx ON lists (board_id);

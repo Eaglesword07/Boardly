@@ -1,14 +1,5 @@
 import * as db from "../db/boards.js";
-
-// Helper functions for validating input and parsing IDs
-function isValidTitle(title) {
-  return typeof title === "string" && title.trim() !== "";
-}
-
-function parseId(value) {
-  const id = Number(value);
-  return Number.isInteger(id) ? id : null;
-}
+import { isValidTitle, parseId } from "../utils/validate.js"
 
 // Controller functions for handling board-related requests
 export async function listBoards(req, res) {
