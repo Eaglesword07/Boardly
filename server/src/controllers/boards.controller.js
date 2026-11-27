@@ -1,5 +1,7 @@
 import * as db from "../db/boards.js";
-import { isValidTitle, parseId } from "../utils/validate.js"
+import * as listsDb from "../db/lists.js";
+import * as cardsDb from "../db/cards.js";
+import { isValidTitle, parseId } from "../utils/validate.js";
 
 // Controller functions for handling board-related requests
 export async function listBoards(req, res) {
@@ -16,7 +18,15 @@ export async function getBoard(req, res) {
   if (!board) {
     return res.status(404).json({ error: "Board not found" });
   }
-  res.json(board);
+  const lists = await listsDb.getListsByBoard(id);
+  const cards = await cardsDb.getCardsByBoard(id);
+
+  const listsWithCards = lists.map((list) => ({
+    ...list,
+    cards: cards.filter((card) => card.listId === list.id),
+  }));
+
+  res.json({ ...board, lists: listsWithCards });
 }
 
 export async function createBoard(req, res) {
