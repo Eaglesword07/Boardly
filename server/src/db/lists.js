@@ -10,6 +10,17 @@ export async function getListsByBoard(boardId) {
   return rows;
 }
 
+export async function getListById(id, ownerId) {
+  const { rows } = await pool.query(
+    `SELECT l.id, l.board_id AS "boardId", l.title, l.position
+     FROM lists l
+     JOIN boards b ON b.id = l.board_id
+     WHERE l.id = $1 AND b.owner_id = $2`,
+    [id, ownerId]
+  );
+  return rows[0];
+}
+
 export async function createList(boardId, title) {
   const { rows } = await pool.query(
     `INSERT INTO lists (board_id, title, position)
